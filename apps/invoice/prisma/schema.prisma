@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("INVOICE_DATABASE")
+}
+
+enum InvoiceStatus {
+  CREATED
+  SENT
+  CANCELLED
+}
+
+type Client {
+  name    String
+  email   String
+  address String
+}
+
+type InvoiceItem {
+  productId String
+  name      String
+  quantity  Int
+  unitPrice Float
+  vatRate   Float
+  total     Float
+}
+
+model Invoice {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  client       Client
+  totalAmount  Float
+  vatAmount    Float
+  status       InvoiceStatus @default(CREATED)
+  items        InvoiceItem[]
+  supervisorId String?       @db.ObjectId
+  fileUrl      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  deletedAt    DateTime?
+}
